@@ -1,0 +1,160 @@
+/* src/index.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* --- Sci-Fi Light Theme --- */
+  :root {
+    --background: #f0f4f8;      /* A very light, cool gray */
+    --surface: #ffffff;         /* Clean white for cards */
+    --overlay: #e6eaf1;        /* A subtle gray for hover states */
+    --primary: #005f99;        /* A strong, professional blue */
+    --text-main: #121826;      /* Dark charcoal for main text */
+    --text-secondary: #5a6886; /* Medium gray for secondary text */
+    --text-tertiary: #8da0c7;    /* Lighter gray for less important text */
+  }
+
+  /* --- Sci-Fi Dark Theme --- */
+  .dark {
+    --background: #121826;      /* Deep space, cool-toned charcoal */
+    --surface: #1a2233;         /* A slightly lighter panel color */
+    --overlay: #24314a;        /* A subtle blue-gray for hover states */
+    --primary: #0048ff;        /* Electric, glowing cyan for accents */
+    --text-main: #e6f1ff;      /* Bright, slightly cyanish white */
+    --text-secondary: #8da0c7; /* Muted, lighter gray-blue */
+    --text-tertiary: #5a6886;    /* The most muted text color */
+  }
+
+  /* Your body styles will now use the new theme automatically */
+  body {
+    background-color: var(--background);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+   
+  }
+
+  /* Custom scrollbar for a more modern look */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    /* A scrollbar color that works with both light and dark themes */
+    background: #4a4a4a;
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #6a6a6a;
+  }
+}
+
+/* All your component styles below will automatically use the new colors! */
+@layer components {
+  /* Search Form Styling */
+  .search-form {
+    display: flex;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto 2rem auto;
+  }
+
+  .search-input {
+    flex-grow: 1;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    background-color: var(--surface);
+    color: var(--text-main);
+    border: 1px solid var(--overlay);
+    border-radius: 8px 0 0 8px;
+    outline: none;
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+
+  .search-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 25%, transparent);
+  }
+
+  .search-button {
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    color: white; /* Keeping this white as it works for both primary colors */
+    background-color: var(--primary);
+    border: none;
+    border-radius: 0 8px 8px 0;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .search-button:hover {
+    opacity: 0.9;
+  }
+
+  /* Podcasts Grid & Card Styling */
+  .podcasts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .podcast-card {
+    text-decoration: none;
+    color: inherit;
+    background-color: var(--surface);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .podcast-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  }
+
+  .podcast-card-image img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+  }
+
+  .podcast-card-info {
+    padding: 1rem;
+  }
+
+  .podcast-title {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .podcast-author {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+  }
+
+  /* Episode List Styling */
+  .episode-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .episode-item {
+    padding: 1rem;
+    border-bottom: 1px solid var(--overlay);
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .episode-item:hover {
+    background-color: var(--overlay);
+  }
+}
