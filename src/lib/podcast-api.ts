@@ -29,7 +29,7 @@ export const podcastApi = {
         id: p.id.attributes['im:id'],
         title: p['im:name'].label,
         author: p['im:artist'].label,
-        image: p['im:image'][2].label,
+       image: p['im:image'][p['im:image'].length - 1].label,
       }));
     } catch (error) {
       console.error("Error fetching top podcasts:", error);
