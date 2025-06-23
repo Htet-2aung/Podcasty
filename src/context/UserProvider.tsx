@@ -1,6 +1,7 @@
+// src/context/UserProvider.tsx
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from '../lib/supabaseClient'; // Import our Supabase client
+import { supabase } from '../lib/supabaseClient';
 import type { Session, User } from '@supabase/supabase-js';
 import { Podcast, PlayerEpisode } from '../types';
 
@@ -8,10 +9,10 @@ interface UserContextType {
   session: Session | null;
   user: User | null;
   followedPodcasts: Podcast[];
+  favoriteEpisodes: PlayerEpisode[];
   followPodcast: (podcast: Podcast) => void;
   unfollowPodcast: (podcastId: string) => void;
   isFollowing: (podcastId: string) => boolean;
-  favoriteEpisodes: PlayerEpisode[];
   favoriteEpisode: (episode: PlayerEpisode) => void;
   unfavoriteEpisode: (episodeGuid: string) => void;
   isFavorite: (episodeGuid: string) => boolean;
@@ -22,88 +23,137 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const [followedPodcasts, setFollowedPodcasts] = useState<Podcast[]>([]);
   const [favoriteEpisodes, setFavoriteEpisodes] = useState<PlayerEpisode[]>([]);
 
+  // Listen for auth changes to set user session
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
     });
 
-    return () => {
-      subscription.unsubscribe();
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Fetch library data from Supabase when the user logs in
+  useEffect(() => {
+    const fetchLibrary = async () => {
+      if (!user) return;
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('user_favorites')
+        .select('item_id, item_type, item_data')
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error fetching user library:', error);
+      } else if (data) {
+        const podcasts = data
+          .filter(item => item.item_type === 'podcast')
+          .map(item => item.item_data as Podcast);
+        const episodes = data
+          .filter(item => item.item_type === 'episode')
+          .map(item => item.item_data as PlayerEpisode);
+        
+        setFollowedPodcasts(podcasts);
+        setFavoriteEpisodes(episodes);
+      }
+      setLoading(false);
     };
-  }, []);
-  
-  // Persistence for followed podcasts
-  useEffect(() => {
-    const savedPodcasts = localStorage.getItem('followedPodcasts');
-    if (savedPodcasts) {
-      setFollowedPodcasts(JSON.parse(savedPodcasts));
-    }
-  }, []);
 
-  useEffect(() => {
-    localStorage.setItem('followedPodcasts', JSON.stringify(followedPodcasts));
-  }, [followedPodcasts]);
+    fetchLibrary();
+  }, [user]);
 
-  // Persistence for favorite episodes
-  useEffect(() => {
-    const savedEpisodes = localStorage.getItem('favoriteEpisodes');
-    if (savedEpisodes) {
-      setFavoriteEpisodes(JSON.parse(savedEpisodes));
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('favoriteEpisodes', JSON.stringify(favoriteEpisodes));
-  }, [favoriteEpisodes]);
-
-  const followPodcast = (podcast: Podcast) => {
-    if (!followedPodcasts.some(p => p.id === podcast.id)) {
+  const followPodcast = async (podcast: Podcast) => {
+    if (!user) return;
+    const { data, error } = await supabase
+      .from('user_favorites')
+      .insert({
+        user_id: user.id,
+        item_id: podcast.id,
+        item_type: 'podcast',
+        item_data: podcast,
+      })
+      .select();
+    
+    if (!error && data) {
       setFollowedPodcasts(prev => [...prev, podcast]);
+    } else if (error) {
+      console.error('Error following podcast:', error);
     }
   };
 
-  const unfollowPodcast = (podcastId: string) => {
-    setFollowedPodcasts(prev => prev.filter(p => p.id !== podcastId));
+  const unfollowPodcast = async (podcastId: string) => {
+    if (!user) return;
+    const { error } = await supabase
+      .from('user_favorites')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('item_id', podcastId);
+
+    if (!error) {
+      setFollowedPodcasts(prev => prev.filter(p => p.id !== podcastId));
+    } else {
+      console.error('Error unfollowing podcast:', error);
+    }
   };
 
-  const isFollowing = (podcastId: string) => {
-    return followedPodcasts.some(p => p.id === podcastId);
-  };
+  const isFollowing = (podcastId: string) => followedPodcasts.some(p => p.id === podcastId);
 
-  const favoriteEpisode = (episode: PlayerEpisode) => {
-    if (!favoriteEpisodes.some(e => e.guid === episode.guid)) {
+  const favoriteEpisode = async (episode: PlayerEpisode) => {
+    if (!user) return;
+    const { data, error } = await supabase
+      .from('user_favorites')
+      .insert({
+        user_id: user.id,
+        item_id: episode.guid,
+        item_type: 'episode',
+        item_data: episode,
+      })
+      .select();
+
+    if (!error && data) {
       setFavoriteEpisodes(prev => [...prev, episode]);
+    } else if (error) {
+      console.error('Error favoriting episode:', error);
     }
   };
 
-  const unfavoriteEpisode = (episodeGuid: string) => {
-    setFavoriteEpisodes(prev => prev.filter(e => e.guid !== episodeGuid));
+  const unfavoriteEpisode = async (episodeGuid: string) => {
+    if (!user) return;
+    const { error } = await supabase
+      .from('user_favorites')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('item_id', episodeGuid);
+
+    if (!error) {
+      setFavoriteEpisodes(prev => prev.filter(e => e.guid !== episodeGuid));
+    } else {
+      console.error('Error unfavoriting episode:', error);
+    }
   };
 
-  const isFavorite = (episodeGuid: string) => {
-    return favoriteEpisodes.some(e => e.guid === episodeGuid);
-  };
+  const isFavorite = (episodeGuid: string) => favoriteEpisodes.some(e => e.guid === episodeGuid);
 
-  const value = { 
-    session, 
-    user, 
-    followedPodcasts, 
-    followPodcast, 
-    unfollowPodcast, 
-    isFollowing,
+  const value = {
+    session,
+    user,
+    followedPodcasts,
     favoriteEpisodes,
+    followPodcast,
+    unfollowPodcast,
+    isFollowing,
     favoriteEpisode,
     unfavoriteEpisode,
-    isFavorite
+    isFavorite,
   };
 
   return (
     <UserContext.Provider value={value}>
-      {children}
+      {!loading && children}
     </UserContext.Provider>
   );
 }
