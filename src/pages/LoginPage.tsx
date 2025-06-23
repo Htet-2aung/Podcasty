@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useUser } from '../context/UserProvider';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 const LoginPage = () => {
   const { session } = useUser();
