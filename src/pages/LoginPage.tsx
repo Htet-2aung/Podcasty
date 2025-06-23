@@ -3,14 +3,21 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
+import { useUser } from '../context/UserProvider';
 
 const LoginPage = () => {
+  const { session } = useUser();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+// If user is already logged in, redirect to home
+  if (session) {
+    return <Navigate to="/" replace />;
+  }
 
+  
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
