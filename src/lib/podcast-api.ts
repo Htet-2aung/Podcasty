@@ -76,9 +76,6 @@ export const podcastApi = {
 
 
 getEpisodesFromRss: async (rssUrl: string) => {
-    // This PROXY_URL is used to bypass CORS restrictions when fetching RSS feeds.
-    const PROXY_URL = 'https://cors.sh/';
-
     try {
       // Fetch the raw XML feed through the proxy
       const response = await fetch(`${PROXY_URL}${rssUrl}`);
