@@ -1,5 +1,3 @@
-// src/context/UserProvider.tsx
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import type { Session, User } from '@supabase/supabase-js';
@@ -35,15 +33,36 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     });
 
-    // Redundantly check the session initially to cover all cases
-     supabase.auth.getSession().then(({ data: { session } }) => {
-        if (!session) {
-            setLoading(false);
-        }
-    })
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        setLoading(false);
+      }
+    });
 
     return () => subscription.unsubscribe();
   }, []);
+  
+  // --- NEW: Effect to handle user profile name consistency ---
+  useEffect(() => {
+    // This function runs when the user object is first loaded
+    const setInitialUserName = async () => {
+      if (user && !user.user_metadata.full_name) {
+        // Check if a name came from the OAuth provider (e.g., Google)
+        const providerName = user.user_metadata.name || user.user_metadata.user_name;
+
+        if (providerName) {
+          // If the user has no `full_name` set in our app,
+          // but a name is available from the provider, save it as their default.
+          await supabase.auth.updateUser({
+            data: { full_name: providerName }
+          });
+        }
+      }
+    };
+
+    setInitialUserName();
+  }, [user]);
+
 
   // Fetch library data from Supabase when the user logs in
   useEffect(() => {
@@ -52,8 +71,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         setFollowedPodcasts([]);
         setFavoriteEpisodes([]);
         return;
-      };
-
+      }
       const { data, error } = await supabase
         .from('user_favorites')
         .select('item_id, item_type, item_data')
