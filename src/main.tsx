@@ -21,6 +21,13 @@ import './index.css';
 import CategoryPage from './pages/CategoryPage.tsx';
 // Define the application's routes
 const router = createBrowserRouter([
+  // Public routes
+  {
+    path: '/welcome',
+    element: <WelcomePage />,
+    errorElement: <ErrorPage />,
+  },
+  
   {
     path: '/',
     element: <App />,
