@@ -1,7 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode, useRef, useEffect } from 'react';
 import { PlayerEpisode } from '../types';
 
-
 interface AudioContextType {
   currentEpisode: PlayerEpisode | null;
   playEpisode: (episode: PlayerEpisode) => void;
@@ -13,69 +12,74 @@ interface AudioContextType {
   duration: number;
   currentTime: number;
 }
+
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
 
-// Add the 'export' keyword here
 export function AudioProvider({ children }: { children: ReactNode }) {
   const [currentEpisode, setCurrentEpisode] = useState<PlayerEpisode | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
-  // It's better to initialize the Audio object inside a useEffect or useRef initializer to avoid re-creation on re-renders.
-  // The current implementation is okay, but `new Audio()` will be called on every render.
   const audioRef = useRef<HTMLAudioElement>(new Audio());
 
+  // This consolidated useEffect handles all audio playback logic.
+  useEffect(() => {
+    const audio = audioRef.current;
+    
+    // Check if the episode has changed and update the audio source
+    if (currentEpisode && audio.src !== currentEpisode.audio) {
+        audio.src = currentEpisode.audio;
+    }
+    
+    // Handle play/pause based on the isPlaying state
+    if (isPlaying) {
+        audio.play().catch(e => {
+            console.error("Audio play failed", e);
+            setIsPlaying(false); // Reset state on failure
+        });
+    } else {
+        audio.pause();
+    }
+  }, [currentEpisode, isPlaying]);
+
+  // This useEffect sets up event listeners for time and duration updates.
   useEffect(() => {
     const audio = audioRef.current;
     const setAudioData = () => setDuration(audio.duration);
     const setAudioTime = () => setCurrentTime(audio.currentTime);
+
     audio.addEventListener('loadeddata', setAudioData);
     audio.addEventListener('timeupdate', setAudioTime);
-
-    if (currentEpisode) {
-        if (isPlaying) {
-            audio.play().catch(e => console.error("Audio play failed", e));
-        } else {
-            audio.pause();
-        }
-    }
 
     return () => {
       audio.removeEventListener('loadeddata', setAudioData);
       audio.removeEventListener('timeupdate', setAudioTime);
-    }
-    // Dependency array should include currentEpisode
-  }, [isPlaying, currentEpisode]);
+    };
+  }, []); // Run only once
 
-  useEffect(() => {
-    if (currentEpisode) {
-      audioRef.current.src = currentEpisode.audio;
-      setIsPlaying(true); // Autoplay when a new episode is selected
-    } else {
-        setIsPlaying(false);
-    }
-  }, [currentEpisode]);
-  
   const playEpisode = (episode: PlayerEpisode) => {
-    if (currentEpisode?.id !== episode.id) {
-        setCurrentEpisode(episode);
+    if (currentEpisode?.guid !== episode.guid) {
+      // If a new episode is selected, set it and start playing.
+      setCurrentEpisode(episode);
+      setIsPlaying(true);
     } else {
-        togglePlayPause();
+      // If the same episode is tapped, just toggle play/pause.
+      togglePlayPause();
     }
   };
 
   const togglePlayPause = () => {
     if (currentEpisode) {
-        setIsPlaying(!isPlaying);
+      setIsPlaying(prevIsPlaying => !prevIsPlaying);
     }
   };
 
   const value = { currentEpisode, playEpisode, isPlaying, togglePlayPause, isMaximized, setIsMaximized, audioRef, duration, currentTime };
+  
   return <AudioContext.Provider value={value}>{children}</AudioContext.Provider>;
 }
 
-// And also export the hook
 export const useAudioPlayer = () => {
   const context = useContext(AudioContext);
   if (!context) {
