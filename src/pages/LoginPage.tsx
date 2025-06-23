@@ -36,7 +36,7 @@ const LoginPage = () => {
 
   return (
     <div className="flex justify-center items-center pt-16">
-      <div className="w-auto h-auto max-w-xs max-h-80 mb-8">
+      <div className="w-48 h-48">
         <DotLottieReact
           src="https://lottie.host/e67163cc-700f-43fa-ac8a-33e9326d8395/BMW7ZD9dwm.lottie"
           loop
