@@ -11,6 +11,10 @@
     {
       "source": "/api/us/rss/:path*",
       "destination": "https://itunes.apple.com/us/rss/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
