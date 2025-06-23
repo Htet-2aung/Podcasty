@@ -1,8 +1,16 @@
 {
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "https://itunes.apple.com/:path*"
+      "source": "/api/search",
+      "destination": "https://itunes.apple.com/search"
+    },
+    {
+      "source": "/api/lookup",
+      "destination": "https://itunes.apple.com/lookup"
+    },
+    {
+      "source": "/api/us/rss/:path*",
+      "destination": "https://itunes.apple.com/us/rss/:path*"
     }
   ]
 }
