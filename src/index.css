@@ -6,54 +6,53 @@
 @tailwind utilities;
 
 @layer base {
-  /* --- Sci-Fi Light Theme --- */
+  /* --- Modern Light Theme --- */
   :root {
-    --background: #f0f4f8;      /* A very light, cool gray */
-    --surface: #ffffff;         /* Clean white for cards */
-    --overlay: #e6eaf1;        /* A subtle gray for hover states */
-    --primary: #005f99;        /* A strong, professional blue */
-    --text-main: #121826;      /* Dark charcoal for main text */
-    --text-secondary: #5a6886; /* Medium gray for secondary text */
-    --text-tertiary: #8da0c7;    /* Lighter gray for less important text */
+    --background: #f9fafb;      /* Tailwind gray-50 */
+    --surface: #ffffff;         /* White */
+    --overlay: #f3f4f6;        /* Tailwind gray-100 */
+    --primary: #4f46e5;        /* Tailwind indigo-600 */
+    --text-main: #111827;      /* Tailwind gray-900 */
+    --text-secondary: #6b7280; /* Tailwind gray-500 */
+    --text-tertiary: #9ca3af;    /* Tailwind gray-400 */
   }
 
-  /* --- Sci-Fi Dark Theme --- */
+  /* --- Modern Dark Theme --- */
   .dark {
-    --background: #121826;      /* Deep space, cool-toned charcoal */
-    --surface: #1a2233;         /* A slightly lighter panel color */
-    --overlay: #24314a;        /* A subtle blue-gray for hover states */
-    --primary: #0048ff;        /* Electric, glowing cyan for accents */
-    --text-main: #e6f1ff;      /* Bright, slightly cyanish white */
-    --text-secondary: #8da0c7; /* Muted, lighter gray-blue */
-    --text-tertiary: #5a6886;    /* The most muted text color */
+    --background: #111827;      /* Tailwind gray-900 */
+    --surface: #1f2937;         /* Tailwind gray-800 */
+    --overlay: #374151;        /* Tailwind gray-700 */
+    --primary: #6366f1;        /* Tailwind indigo-500 */
+    --text-main: #f9fafb;      /* Tailwind gray-50 */
+    --text-secondary: #9ca3af; /* Tailwind gray-400 */
+    --text-tertiary: #4b5563;    /* Tailwind gray-600 */
   }
 
-  /* Your body styles will now use the new theme automatically */
+  /* Body styles now use the new theme automatically */
   body {
     background-color: var(--background);
     color: var(--text-main);
     font-family: 'Inter', sans-serif;
-   
   }
 
   /* Custom scrollbar for a more modern look */
   ::-webkit-scrollbar {
-    width: 8px;
+    width: 10px;
   }
   ::-webkit-scrollbar-track {
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    /* A scrollbar color that works with both light and dark themes */
-    background: #4a4a4a;
+    background: #4b5563; /* Tailwind gray-600 */
     border-radius: 10px;
+    border: 2px solid var(--background); /* Add a border to match the background */
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #6a6a6a;
+    background: #6b7280; /* Tailwind gray-500 */
   }
 }
 
-/* All your component styles below will automatically use the new colors! */
+/* Updated component styles for a more modern feel */
 @layer components {
   /* Search Form Styling */
   .search-form {
@@ -70,23 +69,26 @@
     background-color: var(--surface);
     color: var(--text-main);
     border: 1px solid var(--overlay);
-    border-radius: 8px 0 0 8px;
+    /* Modern: Softer corners */
+    border-radius: 0.5rem 0 0 0.5rem;
     outline: none;
     transition: box-shadow 0.2s, border-color 0.2s;
   }
 
   .search-input:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 25%, transparent);
+    /* Modern: Softer focus ring */
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 20%, transparent);
   }
 
   .search-button {
     padding: 0.75rem 1.5rem;
     font-weight: 600;
-    color: white; /* Keeping this white as it works for both primary colors */
+    color: white;
     background-color: var(--primary);
     border: none;
-    border-radius: 0 8px 8px 0;
+    /* Modern: Softer corners */
+    border-radius: 0 0.5rem 0.5rem 0;
     cursor: pointer;
     transition: opacity 0.2s;
   }
@@ -98,35 +100,37 @@
   /* Podcasts Grid & Card Styling */
   .podcasts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    /* Adjust for better spacing */
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 1.5rem;
   }
 
   .podcast-card {
     text-decoration: none;
     color: inherit;
-    background-color: var(--surface);
-    border-radius: 0.5rem;
+    background-color: transparent; /* Let the content define the background */
+    border-radius: 0.75rem; /* Modern: Even softer corners for cards */
     overflow: hidden;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease;
   }
 
   .podcast-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    transform: translateY(-4px);
   }
-
+  
+  /* Modern: Separate image from info for a cleaner look */
   .podcast-card-image img {
     width: 100%;
     height: auto;
     aspect-ratio: 1 / 1;
     object-fit: cover;
     display: block;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   }
 
   .podcast-card-info {
-    padding: 1rem;
+    padding-top: 0.75rem; /* Space between image and text */
   }
 
   .podcast-title {
