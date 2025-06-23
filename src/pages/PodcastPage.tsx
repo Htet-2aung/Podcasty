@@ -118,7 +118,7 @@ const PodcastPage = () => {
         {episodes.map((episode) => (
           <li 
             key={episode.guid}
-            onClick={() => playEpisode(episode)} 
+            onClick={() => playEpisode(episode, episodes)} 
             className="flex items-center gap-4 p-3 rounded-lg hover:bg-overlay transition-colors cursor-pointer group"
           >
             <img 
