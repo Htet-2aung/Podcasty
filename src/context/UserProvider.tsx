@@ -1,9 +1,8 @@
-// src/context/UserProvider.tsx
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient'; // Import our Supabase client
 import type { Session, User } from '@supabase/supabase-js';
-import { Podcast } from '../types';
+import { Podcast, PlayerEpisode } from '../types';
 
 interface UserContextType {
   session: Session | null;
@@ -12,6 +11,10 @@ interface UserContextType {
   followPodcast: (podcast: Podcast) => void;
   unfollowPodcast: (podcastId: string) => void;
   isFollowing: (podcastId: string) => boolean;
+  favoriteEpisodes: PlayerEpisode[];
+  favoriteEpisode: (episode: PlayerEpisode) => void;
+  unfavoriteEpisode: (episodeGuid: string) => void;
+  isFavorite: (episodeGuid: string) => boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -20,23 +23,20 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [followedPodcasts, setFollowedPodcasts] = useState<Podcast[]>([]);
+  const [favoriteEpisodes, setFavoriteEpisodes] = useState<PlayerEpisode[]>([]);
 
   useEffect(() => {
-    // This is the most important part:
-    // It fetches the initial session and listens for any changes.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
     });
 
-    // Clean up the subscription when the component unmounts
     return () => {
       subscription.unsubscribe();
     };
   }, []);
   
-  // Note: For a full production app, this followed list would be saved
-  // to your Supabase database, not localStorage. But for now, this works.
+  // Persistence for followed podcasts
   useEffect(() => {
     const savedPodcasts = localStorage.getItem('followedPodcasts');
     if (savedPodcasts) {
@@ -47,6 +47,18 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     localStorage.setItem('followedPodcasts', JSON.stringify(followedPodcasts));
   }, [followedPodcasts]);
+
+  // Persistence for favorite episodes
+  useEffect(() => {
+    const savedEpisodes = localStorage.getItem('favoriteEpisodes');
+    if (savedEpisodes) {
+      setFavoriteEpisodes(JSON.parse(savedEpisodes));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('favoriteEpisodes', JSON.stringify(favoriteEpisodes));
+  }, [favoriteEpisodes]);
 
   const followPodcast = (podcast: Podcast) => {
     if (!followedPodcasts.some(p => p.id === podcast.id)) {
@@ -62,7 +74,32 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     return followedPodcasts.some(p => p.id === podcastId);
   };
 
-  const value = { session, user, followedPodcasts, followPodcast, unfollowPodcast, isFollowing };
+  const favoriteEpisode = (episode: PlayerEpisode) => {
+    if (!favoriteEpisodes.some(e => e.guid === episode.guid)) {
+      setFavoriteEpisodes(prev => [...prev, episode]);
+    }
+  };
+
+  const unfavoriteEpisode = (episodeGuid: string) => {
+    setFavoriteEpisodes(prev => prev.filter(e => e.guid !== episodeGuid));
+  };
+
+  const isFavorite = (episodeGuid: string) => {
+    return favoriteEpisodes.some(e => e.guid === episodeGuid);
+  };
+
+  const value = { 
+    session, 
+    user, 
+    followedPodcasts, 
+    followPodcast, 
+    unfollowPodcast, 
+    isFollowing,
+    favoriteEpisodes,
+    favoriteEpisode,
+    unfavoriteEpisode,
+    isFavorite
+  };
 
   return (
     <UserContext.Provider value={value}>
