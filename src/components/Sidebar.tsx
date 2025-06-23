@@ -2,7 +2,6 @@
 
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Home, Search, Library, User, LogIn, LogOut, Settings } from 'lucide-react';
-import ThemeToggle from './ThemeToggle';
 import { useUser } from '../context/UserProvider';
 import { supabase } from '../lib/supabaseClient';
 
@@ -18,6 +17,7 @@ export default function Sidebar() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    // --- FIX: Navigate to a public page after logout ---
     navigate('/welcome');
   };
 
@@ -66,8 +66,6 @@ export default function Sidebar() {
               <LogIn strokeWidth={2.5} /> Login
             </NavLink>
           )}
-           <hr className="my-2 border-overlay" />
-          <ThemeToggle />
         </div>
       </div>
     </aside>
