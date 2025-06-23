@@ -1,8 +1,6 @@
 import { PodcastDetails, PodcastSearchResult } from '../types';
 const PROXY_URL = 'https://api.allorigins.win/raw?url=';
-// src/lib/podcast-api.ts
 
-// This function now calls our local proxy, not a remote server
 const fetchJsonFromProxy = async (path: string) => {
   const response = await fetch(path); // e.g., fetch('/api/lookup?id=123')
   if (!response.ok) {
@@ -12,7 +10,8 @@ const fetchJsonFromProxy = async (path: string) => {
 };
 
 const rss2jsonApi = async (rssUrl: string) => {
-  const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`);
+  // We now request up to 500 items to get the full list of episodes
+  const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&count=500`);
   if (!response.ok) {
     throw new Error('Failed to parse RSS feed via rss2json.');
   }
@@ -80,7 +79,7 @@ export const podcastApi = {
     try {
       const data = await rss2jsonApi(rssUrl);
       return data.items.map((episode: any) => ({
-        id: episode.guid,
+        guid: episode.guid, // Correctly map to guid instead of id
         title: episode.title,
         audio: episode.enclosure.link,
         duration: episode.itunes_duration,
