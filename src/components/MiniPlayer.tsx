@@ -7,8 +7,9 @@ export default function MiniPlayer() {
   if (!currentEpisode) return null;
 
   return (
+    // The 'left-64' class for medium screens and up prevents the overlap with the sidebar
     <div
-      className={`fixed bottom-0 left-0 right-0 z-50 transition-transform duration-500 ${isMaximized ? 'translate-y-full' : 'translate-y-0'}`}
+      className={`fixed bottom-0 right-0 z-50 transition-transform duration-500 md:left-64 left-0 ${isMaximized ? 'translate-y-full' : 'translate-y-0'}`}
       onClick={() => setIsMaximized(true)}
     >
       <div className="bg-[--overlay]/50 p-3 m-2 rounded-xl shadow-2xl shadow-black/50 ring-1 ring-white/10 backdrop-blur-lg cursor-pointer">
