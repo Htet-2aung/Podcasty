@@ -3,12 +3,27 @@ import { ChevronDown, Play, Pause, Rewind, FastForward, Speaker, Clock } from 'l
 import { formatTime } from "../utils/formatters";
 
 export default function NowPlayingView() {
-  const { currentEpisode, isPlaying, togglePlayPause, isMaximized, setIsMaximized, duration, currentTime, audioRef, playbackRate, setPlaybackRate } = useAudioPlayerNowPlaying();
+  const { 
+    currentEpisode, 
+    isPlaying, 
+    togglePlayPause, 
+    playNext, 
+    playPrevious, 
+    isMaximized, 
+    setIsMaximized, 
+    duration, 
+    currentTime, 
+    audioRef, 
+    playbackRate, 
+    setPlaybackRate 
+  } = useAudioPlayerNowPlaying();
 
   if (!currentEpisode) return null;
 
   const handleProgressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    audioRef.current!.currentTime = Number(e.target.value);
+    if (audioRef.current) {
+        audioRef.current.currentTime = Number(e.target.value);
+    }
   }
 
   return (
@@ -38,11 +53,11 @@ export default function NowPlayingView() {
             </div>
 
             <div className="flex items-center justify-center gap-8 my-8">
-                <button className="text-[--text-secondary] hover:text-[--text-main]"><Rewind size={32} /></button>
+                <button onClick={playPrevious} className="text-[--text-secondary] hover:text-[--text-main]"><Rewind size={32} /></button>
                 <button onClick={togglePlayPause} className="bg-[--primary] text-white rounded-full w-20 h-20 flex items-center justify-center text-5xl">
                     {isPlaying ? <Pause size={40} /> : <Play size={40} className="ml-1" />}
                 </button>
-                <button className="text-[--text-secondary] hover:text-[--text-main]"><FastForward size={32} /></button>
+                <button onClick={playNext} className="text-[--text-secondary] hover:text-[--text-main]"><FastForward size={32} /></button>
             </div>
             
             <div className="w-full flex justify-between items-center text-[--text-secondary]">
@@ -52,7 +67,7 @@ export default function NowPlayingView() {
                 </div>
                  <div className="flex gap-2 items-center">
                     <span className="font-bold">{playbackRate}x</span>
-                    <button onClick={() => setPlaybackRate(playbackRate >= 2 ? 1 : playbackRate + 0.25)}>Speed</button>
+                    <button onClick={() => setPlaybackRate && setPlaybackRate(playbackRate >= 2 ? 1 : playbackRate + 0.25)}>Speed</button>
                  </div>
             </div>
         </div>
