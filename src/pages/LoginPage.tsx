@@ -67,7 +67,6 @@ const LoginPage = () => {
       {/* Right side: Login Form */}
       <div className="flex items-center justify-center p-6 sm:p-12 h-screen">
         <div className="w-full max-w-md">
-          {/* Mobile Header */}
           <div className="lg:hidden mb-8 text-center">
              <div className="w-40 h-40 mx-auto">
                 <DotLottieReact src="/podcast-animation.lottie" loop autoplay />
