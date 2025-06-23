@@ -47,7 +47,7 @@ export default function NowPlayingView() {
         </button>
 
         <div className="w-full max-w-md flex flex-col items-center">
-            <img src={currentEpisode.image} alt={currentEpisode.title} className="w-full aspect-square rounded-2xl shadow-2xl shadow-black/40 mb-8" />
+            <img src={currentEpisode.image} alt={currentEpisode.title} className="max-w-[200px] max-h-[200px] aspect-square rounded-2xl shadow-2xl shadow-black/40 mb-8" />
             <div className="text-center">
               <h2 className="text-3xl font-bold text-text-main">{currentEpisode.title}</h2>
               <h3 className="text-lg text-text-secondary mt-2">{currentEpisode.podcastTitle}</h3>
