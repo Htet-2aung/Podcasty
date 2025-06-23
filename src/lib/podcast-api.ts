@@ -1,7 +1,7 @@
 import { PodcastDetails, PodcastSearchResult } from '../types';
 
-// Using a CORS proxy to fetch feeds directly
-const PROXY_URL = 'https://api.allorigins.win/raw?url=';
+// Using a more reliable CORS proxy: cors.sh
+const PROXY_URL = 'https://cors.sh/';
 
 const fetchJsonFromProxy = async (path: string) => {
   const response = await fetch(path);
@@ -66,7 +66,8 @@ export const podcastApi = {
 
   getEpisodesFromRss: async (rssUrl: string) => {
     try {
-      const response = await fetch(`${PROXY_URL}${encodeURIComponent(rssUrl)}`);
+      // The new proxy is prepended directly to the RSS URL.
+      const response = await fetch(`${PROXY_URL}${rssUrl}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch RSS feed. Status: ${response.status}`);
       }
@@ -85,7 +86,7 @@ export const podcastApi = {
         const published = item.querySelector("pubDate")?.textContent || '';
         const description = item.querySelector("description")?.textContent || '';
         
-        if (audio) { // Only add if it's a playable episode
+        if (audio) {
             episodes.push({
               guid,
               title,
