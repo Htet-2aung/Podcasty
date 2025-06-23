@@ -1,6 +1,8 @@
 import { PodcastDetails, PodcastSearchResult } from '../types';
 const PROXY_URL = 'https://api.allorigins.win/raw?url=';
+// src/lib/podcast-api.ts
 
+// This function now calls our local proxy, not a remote server
 const fetchJsonFromProxy = async (path: string) => {
   const response = await fetch(path); // e.g., fetch('/api/lookup?id=123')
   if (!response.ok) {
@@ -10,7 +12,6 @@ const fetchJsonFromProxy = async (path: string) => {
 };
 
 const rss2jsonApi = async (rssUrl: string) => {
-  // We now request up to 500 items to get the full list of episodes
   const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&count=500`);
   if (!response.ok) {
     throw new Error('Failed to parse RSS feed via rss2json.');
@@ -73,22 +74,31 @@ export const podcastApi = {
     }
   },
 
-  
-
   getEpisodesFromRss: async (rssUrl: string) => {
     try {
       const data = await rss2jsonApi(rssUrl);
-      return data.items.map((episode: any) => ({
-        guid: episode.guid, // Correctly map to guid instead of id
-        title: episode.title,
-        audio: episode.enclosure.link,
-        duration: episode.itunes_duration,
-        published: episode.pubDate,
-        description: episode.description,
-      }));
+      
+      // Prevent crash if feed items are missing
+      if (!Array.isArray(data.items)) {
+        console.warn("RSS feed items are not an array.", { rssUrl, data });
+        return [];
+      }
+      
+      return data.items
+        .map((episode: any) => ({
+          guid: episode.guid,
+          title: episode.title || 'Untitled Episode',
+          // Safely access audio link
+          audio: episode.enclosure?.link,
+          duration: episode.itunes_duration || null,
+          published: episode.pubDate,
+          description: episode.description || '',
+        }))
+        // Ensure we only return episodes that are playable
+        .filter(episode => episode.audio);
     } catch (error) {
       console.error(`Error fetching episodes from RSS feed:`, error);
-      throw error;
+      throw error; // Propagate error to be handled in the UI
     }
   },
 
