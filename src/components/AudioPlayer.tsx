@@ -1,86 +1,37 @@
-import React, { createContext, useState, useContext, ReactNode, useRef, useEffect } from 'react';
+// ▶️ FILE: src/components/AudioPlayer.tsx
+// The floating audio player component.
+// =======================================================================
+import React from 'react';
 import { PlayerEpisode } from '../types';
+import { Play, Pause } from 'lucide-react';
 
-
-interface AudioContextType {
-  currentEpisode: PlayerEpisode | null;
-  playEpisode: (episode: PlayerEpisode) => void;
-  togglePlayPause: () => void;
+interface AudioPlayerProps {
+  episode: PlayerEpisode;
   isPlaying: boolean;
-  isMaximized: boolean;
-  setIsMaximized: React.Dispatch<React.SetStateAction<boolean>>;
+  onPlayPause: () => void;
   audioRef: React.RefObject<HTMLAudioElement>;
-  duration: number;
-  currentTime: number;
-}
-const AudioContext = createContext<AudioContextType | undefined>(undefined);
-
-// Add the 'export' keyword here
-export function AudioProvider({ children }: { children: ReactNode }) {
-  const [currentEpisode, setCurrentEpisode] = useState<PlayerEpisode | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMaximized, setIsMaximized] = useState(false);
-  const [duration, setDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
-  // It's better to initialize the Audio object inside a useEffect or useRef initializer to avoid re-creation on re-renders.
-  // The current implementation is okay, but `new Audio()` will be called on every render.
-  const audioRef = useRef<HTMLAudioElement>(new Audio());
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    const setAudioData = () => setDuration(audio.duration);
-    const setAudioTime = () => setCurrentTime(audio.currentTime);
-    audio.addEventListener('loadeddata', setAudioData);
-    audio.addEventListener('timeupdate', setAudioTime);
-
-    if (currentEpisode) {
-        if (isPlaying) {
-            audio.play().catch(e => console.error("Audio play failed", e));
-        } else {
-            audio.pause();
-        }
-    }
-
-    return () => {
-      audio.removeEventListener('loadeddata', setAudioData);
-      audio.removeEventListener('timeupdate', setAudioTime);
-    }
-    // Dependency array should include currentEpisode
-  }, [isPlaying, currentEpisode]);
-
-  useEffect(() => {
-    if (currentEpisode) {
-      audioRef.current.src = currentEpisode.audio;
-      setIsPlaying(true); // Autoplay when a new episode is selected
-    } else {
-        setIsPlaying(false);
-    }
-  }, [currentEpisode]);
-  
-  const playEpisode = (episode: PlayerEpisode) => {
-    // BUG FIX: Compare episodes by guid, not id.
-    if (currentEpisode?.guid !== episode.guid) {
-        setCurrentEpisode(episode);
-    } else {
-        togglePlayPause();
-    }
-  };
-
-  const togglePlayPause = () => {
-    if (currentEpisode) {
-        setIsPlaying(!isPlaying);
-    }
-  };
-
-  const value = { currentEpisode, playEpisode, isPlaying, togglePlayPause, isMaximized, setIsMaximized, audioRef, duration, currentTime };
-  return <AudioContext.Provider value={value}>{children}</AudioContext.Provider>;
 }
 
-// And also export the hook
-export const useAudioPlayer = () => {
-  const context = useContext(AudioContext);
-  if (!context) {
-    throw new Error('useAudioPlayer must be used within an AudioProvider');
-  }
-  return context;
-};
+export default function AudioPlayer({ episode, isPlaying, onPlayPause }: AudioPlayerProps) {
+  return (
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[95%] max-w-4xl z-50">
+      <div className="bg-overlay/50 p-3 rounded-xl shadow-2xl shadow-black/50 ring-1 ring-white/10 backdrop-blur-lg">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <img src={episode.image} alt={episode.title} className="w-14 h-14 rounded-md object-cover" />
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold truncate text-text-main">{episode.title}</h3>
+              <p className="text-sm text-text-secondary truncate">{episode.podcastTitle}</p>
+            </div>
+          </div>
+          <button
+            onClick={onPlayPause}
+            className="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center text-3xl shrink-0 transition-transform hover:scale-110 active:scale-95"
+          >
+            {isPlaying ? <Pause size={24} /> : <Play size={24} className="ml-1" />}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
