@@ -13,13 +13,13 @@ const WelcomePage = () => {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-background text-text-main p-8 text-center">
-      
-      <DotLottieReact
-      src="https://lottie.host/79d8548c-3630-4f9e-9194-66aa466cc7c3/M1wQDyDKc5.lottie"
-      loop
-      autoplay
-    />
-      
+     <div className="w-auto h-auto max-w-xs max-h-80 mb-8">
+        <DotLottieReact
+          src="https://lottie.host/79d8548c-3630-4f9e-9194-66aa466cc7c3/M1wQDyDKc5.lottie"
+          loop
+          autoplay
+        />
+      </div>
       <h1 className="text-4xl font-bold mb-4">Say it with Podcast</h1>
       <p className="text-lg text-text-secondary mb-8 max-w-sm">
         Discover, listen, and subscribe to your favorite podcasts from around the world.
