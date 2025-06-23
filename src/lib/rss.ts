@@ -1,3 +1,5 @@
+// This is a Vercel Serverless Function that will act as our own reliable proxy.
+
 export const config = {
   runtime: 'edge',
 };
