@@ -1,7 +1,6 @@
 # Podcasty - A Modern Podcast Discovery Platform
 
-![Podcasty Welcome Page](https://i.imgur.com/your-screenshot-url.png)
-_Note: Replace the image URL above with a screenshot of your application._
+![Podcasty Welcome Page](https://github.com/Htet-2aung/Podcasty/blob/main/assets/demo2.png?raw=true)
 
 Podcasty is a sleek, modern web application for discovering, listening to, and organizing your favorite podcasts. Built with a powerful stack including React, Vite, and Supabase, it offers a seamless and feature-rich user experience.
 
