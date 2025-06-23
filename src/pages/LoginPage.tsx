@@ -39,7 +39,7 @@ const LoginPage = () => {
       <div className="hidden lg:flex flex-col items-center justify-center bg-surface p-12 text-center">
         <div className="w-full max-w-sm">
           <DotLottieReact
-            src="https://lottie.host/aa65962d-fa5a-4535-9c12-1b8eec446804/D81ZSOSAbp.lottie"
+            src="https://lottie.host/e67163cc-700f-43fa-ac8a-33e9326d8395/BMW7ZD9dwm.lottie"
             loop
             autoplay
           />
