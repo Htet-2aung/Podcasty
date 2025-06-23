@@ -1,6 +1,7 @@
 import { useAudioPlayer as useAudioPlayerNowPlaying } from "../context/AudioProvider";
-import { ChevronDown, Play, Pause, Rewind, FastForward, Speaker, Clock } from 'lucide-react';
+import { ChevronDown, Play, Pause, Rewind, FastForward, Speaker, Clock, Heart } from 'lucide-react';
 import { formatTime } from "../utils/formatters";
+import { useUser } from "../context/UserProvider";
 
 export default function NowPlayingView() {
   const { 
@@ -18,7 +19,20 @@ export default function NowPlayingView() {
     setPlaybackRate 
   } = useAudioPlayerNowPlaying();
 
+  const { favoriteEpisode, unfavoriteEpisode, isFavorite } = useUser();
+
   if (!currentEpisode) return null;
+
+  const isCurrentlyFavorite = currentEpisode ? isFavorite(currentEpisode.guid) : false;
+
+  const handleFavoriteToggle = () => {
+    if (!currentEpisode) return;
+    if (isCurrentlyFavorite) {
+      unfavoriteEpisode(currentEpisode.guid);
+    } else {
+      favoriteEpisode(currentEpisode);
+    }
+  };
 
   const handleProgressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (audioRef.current) {
@@ -34,10 +48,22 @@ export default function NowPlayingView() {
 
         <div className="w-full max-w-md flex flex-col items-center">
             <img src={currentEpisode.image} alt={currentEpisode.title} className="w-full aspect-square rounded-2xl shadow-2xl shadow-black/40 mb-8" />
-            <h2 className="text-3xl font-bold text-center text-[--text-main]">{currentEpisode.title}</h2>
-            <h3 className="text-lg text-[--text-secondary] mt-2">{currentEpisode.podcastTitle}</h3>
-
-            <div className="w-full mt-8">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-text-main">{currentEpisode.title}</h2>
+              <h3 className="text-lg text-text-secondary mt-2">{currentEpisode.podcastTitle}</h3>
+            </div>
+            
+            <div className="flex items-center justify-center gap-8 my-8 w-full">
+                <button onClick={handleFavoriteToggle} className="text-primary"><Heart size={28} fill={isCurrentlyFavorite ? 'currentColor' : 'none'} /></button>
+                <button onClick={playPrevious} className="text-[--text-secondary] hover:text-[--text-main]"><Rewind size={32} /></button>
+                <button onClick={togglePlayPause} className="bg-[--primary] text-white rounded-full w-20 h-20 flex items-center justify-center text-5xl">
+                    {isPlaying ? <Pause size={40} /> : <Play size={40} className="ml-1" />}
+                </button>
+                <button onClick={playNext} className="text-[--text-secondary] hover:text-[--text-main]"><FastForward size={32} /></button>
+                <div className="w-[28px]"></div>
+            </div>
+            
+            <div className="w-full mt-4">
                 <input
                     type="range"
                     min="0"
@@ -50,25 +76,6 @@ export default function NowPlayingView() {
                     <span>{formatTime(currentTime)}</span>
                     <span>{formatTime(duration)}</span>
                 </div>
-            </div>
-
-            <div className="flex items-center justify-center gap-8 my-8">
-                <button onClick={playPrevious} className="text-[--text-secondary] hover:text-[--text-main]"><Rewind size={32} /></button>
-                <button onClick={togglePlayPause} className="bg-[--primary] text-white rounded-full w-20 h-20 flex items-center justify-center text-5xl">
-                    {isPlaying ? <Pause size={40} /> : <Play size={40} className="ml-1" />}
-                </button>
-                <button onClick={playNext} className="text-[--text-secondary] hover:text-[--text-main]"><FastForward size={32} /></button>
-            </div>
-            
-            <div className="w-full flex justify-between items-center text-[--text-secondary]">
-                <div className="flex gap-2 items-center">
-                    <Clock size={20} />
-                    <span>Timer</span>
-                </div>
-                 <div className="flex gap-2 items-center">
-                    <span className="font-bold">{playbackRate}x</span>
-                    <button onClick={() => setPlaybackRate && setPlaybackRate(playbackRate >= 2 ? 1 : playbackRate + 0.25)}>Speed</button>
-                 </div>
             </div>
         </div>
     </div>
