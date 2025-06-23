@@ -1,30 +1,26 @@
 // src/pages/PodcastPage.tsx
 
 import React, { useEffect, useState } from 'react';
-// FIXED: Import useLocation to read the state passed from the Link
 import { useParams, useLocation } from 'react-router-dom';
 import { podcastApi } from '../lib/podcast-api';
 import { useAudioPlayer } from '../context/AudioProvider';
 import { PodcastDetails, PlayerEpisode, Podcast } from '../types';
-import { useUser } from '../context/UserProvider'; // 1. Import the useUser hook
+import { useUser } from '../context/UserProvider';
 
 const PodcastPage = () => {
   const { podcastId } = useParams<{ podcastId: string }>();
-  // FIXED: useLocation hook to get the passed state
   const location = useLocation();
-  // FIXED: Initialize state with the data from the Link, if it exists
   const initialData = location.state?.podcast as Podcast;
-// 2. Get follow functions and status from the UserContext
- 
+  
   const [podcast, setPodcast] = useState<PodcastDetails | Podcast | null>(initialData);
   const [episodes, setEpisodes] = useState<PlayerEpisode[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const { playEpisode } = useAudioPlayer();
- const { followPodcast, unfollowPodcast, isFollowing } = useUser();
+  const { followPodcast, unfollowPodcast, isFollowing } = useUser();
 
- const isCurrentlyFollowing = podcast ? isFollowing(podcast.id) : false;
+  const isCurrentlyFollowing = podcast ? isFollowing(podcast.id) : false;
 
   const handleFollowToggle = () => {
     if (!podcast) return;
@@ -32,7 +28,6 @@ const PodcastPage = () => {
     if (isCurrentlyFollowing) {
       unfollowPodcast(podcast.id);
     } else {
-      // We need to ensure we pass the simple Podcast object, not PodcastDetails
       const simplePodcast: Podcast = {
         id: podcast.id,
         title: podcast.title,
@@ -53,20 +48,17 @@ const PodcastPage = () => {
       }
 
       try {
-        // We can set loading to false sooner if we already have initial data
         setIsLoading(!initialData);
         setError(null);
 
-        // Fetch the full details (which includes the important rssUrl)
         const details = await podcastApi.getPodcastDetails(podcastId);
-        // Set the full details, which might include more info
         setPodcast(details);
 
         if (details.rssUrl) {
           const episodeData = await podcastApi.getEpisodesFromRss(details.rssUrl);
           const episodesWithArt = episodeData.map(episode => ({
             ...episode,
-            image: details.image,
+            image: details.image, // Use the main podcast image for each episode
           }));
           setEpisodes(episodesWithArt);
         } else {
@@ -84,7 +76,7 @@ const PodcastPage = () => {
     fetchDetailsAndEpisodes();
   }, [podcastId, initialData]);
 
-  if (isLoading) {
+  if (isLoading && !podcast) {
     return <div className="text-center p-10">Loading...</div>;
   }
 
@@ -98,14 +90,12 @@ const PodcastPage = () => {
 
   return (
     <div className="podcast-detail-page">
-      {/* This will now show the image and title instantly! */}
-      <div className="flex flex-col md:flex-row gap-8 items-start">
-        <img src={podcast.image} alt={podcast.title} className="w-full md:w-48 h-auto rounded-lg shadow-lg" />
-        <div>
+      <div className="flex flex-col md:flex-row gap-8 items-start mb-8">
+        <img src={podcast.image} alt={podcast.title} className="w-full md:w-48 h-auto rounded-lg shadow-lg flex-shrink-0" />
+        <div className="flex-grow">
           <h1 className="text-4xl font-bold">{podcast.title}</h1>
           <p className="text-xl text-text-secondary mt-1">{podcast.author}</p>
-          {/* We can show a description if it exists */}
-          {/* 3. Add the Follow/Unfollow Button */}
+          {podcast.description && <p className="mt-4 text-text-secondary">{podcast.description}</p>}
           <button
             onClick={handleFollowToggle}
             className={`mt-6 px-6 py-2 font-bold rounded-full transition-colors ${
@@ -116,20 +106,29 @@ const PodcastPage = () => {
           >
             {isCurrentlyFollowing ? 'Following' : 'Follow'}
           </button>
-
-          {podcast.description && <p className="mt-4">{podcast.description}</p>}
-
         </div>
       </div>
       
       <hr className="my-8 border-overlay" />
 
-      {/* The episode list will appear here once it's loaded */}
-      <h2 className="text-2xl font-bold mb-4">Episodes ({episodes.length} most recent)</h2>
-      <ul className="episode-list">
-        {episodes.map(episode => (
-          <li key={episode.id} onClick={() => playEpisode(episode)} className="episode-item">
-            {episode.title}
+      <h2 className="text-2xl font-bold mb-4">Episodes ({episodes.length})</h2>
+      
+      {/* New Episode List Layout */}
+      <ul className="space-y-2">
+        {episodes.map((episode) => (
+          <li 
+            key={episode.guid}
+            onClick={() => playEpisode(episode)} 
+            className="flex items-center gap-4 p-3 rounded-lg hover:bg-overlay transition-colors cursor-pointer group"
+          >
+            <img 
+              src={episode.image} 
+              alt={episode.title} 
+              className="w-16 h-16 rounded-md object-cover flex-shrink-0"
+            />
+            <div className="flex-1">
+              <p className="font-semibold text-text-main group-hover:text-primary transition-colors">{episode.title}</p>
+            </div>
           </li>
         ))}
       </ul>
