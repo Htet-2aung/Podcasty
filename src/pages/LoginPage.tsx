@@ -14,6 +14,12 @@ const LoginPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // --- START: Temporary Debugging Code ---
+  const supabaseUrlLoaded = import.meta.env.VITE_SUPABASE_URL ? 'Yes, loaded.' : 'No, MISSING!';
+  const supabaseKeyLoaded = import.meta.env.VITE_SUPABASE_ANON_KEY ? 'Yes, loaded.' : 'No, MISSING!';
+  // --- END: Temporary Debugging Code ---
+
+
   if (session) {
     return <Navigate to="/" replace />;
   }
@@ -34,12 +40,20 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen w-full lg:grid lg:grid-cols-2 bg-background">
+    <div className="min-h-screen w-full lg:grid lg:grid-cols-2 bg-background relative">
+      {/* --- START: Temporary Debugging Box --- */}
+      <div className="absolute top-0 left-0 p-4 m-4 bg-yellow-300 text-black rounded-lg shadow-lg text-sm z-50">
+        <h3 className="font-bold text-lg mb-2">Vercel Environment Debug</h3>
+        <p><strong>VITE_SUPABASE_URL:</strong> <span style={{ color: supabaseUrlLoaded.includes('No') ? 'red' : 'green' }}>{supabaseUrlLoaded}</span></p>
+        <p><strong>VITE_SUPABASE_ANON_KEY:</strong> <span style={{ color: supabaseKeyLoaded.includes('No') ? 'red' : 'green' }}>{supabaseKeyLoaded}</span></p>
+      </div>
+      {/* --- END: Temporary Debugging Box --- */}
+
       {/* Left side: Lottie Animation and Branding (visible on large screens) */}
       <div className="hidden lg:flex flex-col items-center justify-center bg-surface p-12 text-center">
         <div className="w-full max-w-sm">
           <DotLottieReact
-            src="https://lottie.host/e67163cc-700f-43fa-ac8a-33e9326d8395/BMW7ZD9dwm.lottie"
+            src="/podcast-animation.lottie"
             loop
             autoplay
           />
