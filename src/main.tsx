@@ -20,13 +20,14 @@ import PodcastPage from './pages/PodcastPage.tsx';
 import LibraryPage from './pages/LibraryPage.tsx';
 import ProfilePage from './pages/ProfilePage.tsx';
 import CategoryPage from './pages/CategoryPage.tsx';
+import SettingsPage from './pages/SettingsPage.tsx'; // Import the SettingsPage
 import ProtectedRoute from './components/ProtectedRoute.tsx';
 
 import './index.css';
 
 // Define the application's routes
 const router = createBrowserRouter([
-  // Public routes
+  // ... (public routes remain the same)
   {
     path: '/welcome',
     element: <WelcomePage />,
@@ -77,6 +78,11 @@ const router = createBrowserRouter([
             path: 'category/:genreId',
             element: <CategoryPage />,
           },
+          // --- ADD THIS ROUTE ---
+          {
+            path: 'settings',
+            element: <SettingsPage />,
+          },
         ],
       },
     ],
@@ -96,5 +102,3 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     </HelmetProvider>
   </React.StrictMode>
 );
-
-
