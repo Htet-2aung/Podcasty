@@ -35,6 +35,14 @@ const LoginPage = () => {
 
   return (
     <div className="flex justify-center items-center pt-16">
+      <div className="w-auto h-auto max-w-xs max-h-80 mb-8">
+        <DotLottieReact
+          src="https://lottie.host/e67163cc-700f-43fa-ac8a-33e9326d8395/BMW7ZD9dwm.lottie"
+          loop
+          autoplay
+        />
+      </div>
+      
       <form onSubmit={handleLogin} className="bg-surface p-8 rounded-lg shadow-md w-full max-w-md">
         <h1 className="text-3xl font-bold mb-6 text-center">Log In</h1>
         {error && <p className="bg-red-500/20 text-red-500 p-3 rounded-md mb-4">{error}</p>}
