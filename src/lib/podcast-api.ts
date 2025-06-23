@@ -76,14 +76,14 @@ export const podcastApi = {
 
 
 getEpisodesFromRss: async (rssUrl: string) => {
-    // Switching to a different CORS proxy for better reliability.
-    const PROXY_URL = 'https://thingproxy.freeboard.io/fetch/';
-
     try {
-      const response = await fetch(`${PROXY_URL}${rssUrl}`);
+      // Call our own serverless function proxy instead of an external one.
+      const response = await fetch(`/api/rss?url=${encodeURIComponent(rssUrl)}`);
+
       if (!response.ok) {
-        throw new Error(`Failed to fetch RSS feed via proxy. Status: ${response.status}`);
+        throw new Error(`Failed to fetch RSS via internal proxy. Status: ${response.status}`);
       }
+
       const str = await response.text();
       const data = new window.DOMParser().parseFromString(str, "text/xml");
   
@@ -118,7 +118,6 @@ getEpisodesFromRss: async (rssUrl: string) => {
       throw error;
     }
   },
-  
 
   searchPodcasts: async (query: string) => {
     try {
