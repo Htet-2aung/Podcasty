@@ -1,20 +1,12 @@
 import { PodcastDetails, PodcastSearchResult } from '../types';
-const PROXY_URL = 'https://api.allorigins.win/raw?url=';
-// src/lib/podcast-api.ts
 
-// This function now calls our local proxy, not a remote server
+// Using a CORS proxy to fetch feeds directly
+const PROXY_URL = 'https://api.allorigins.win/raw?url=';
+
 const fetchJsonFromProxy = async (path: string) => {
-  const response = await fetch(path); // e.g., fetch('/api/lookup?id=123')
+  const response = await fetch(path);
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  return response.json();
-};
-
-const rss2jsonApi = async (rssUrl: string) => {
-  const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&count=500`);
-  if (!response.ok) {
-    throw new Error('Failed to parse RSS feed via rss2json.');
   }
   return response.json();
 };
@@ -22,14 +14,13 @@ const rss2jsonApi = async (rssUrl: string) => {
 export const podcastApi = {
   getTopPodcasts: async () => {
     try {
-      // FIXED: Use the local proxy
       const data = await fetchJsonFromProxy('/api/us/rss/toppodcasts/limit=100/genre=1310/json');
       if (!data?.feed?.entry) return [];
       return data.feed.entry.map((p: any) => ({
         id: p.id.attributes['im:id'],
         title: p['im:name'].label,
         author: p['im:artist'].label,
-       image: p['im:image'][p['im:image'].length - 1].label,
+        image: p['im:image'][p['im:image'].length - 1].label,
       }));
     } catch (error) {
       console.error("Error fetching top podcasts:", error);
@@ -39,7 +30,6 @@ export const podcastApi = {
 
   getPodcastDetails: async (podcastId: string) => {
     try {
-      // FIXED: Use the local proxy
       const data = await fetchJsonFromProxy(`/api/lookup?id=${podcastId}`);
       if (data.resultCount === 0) throw new Error('Podcast not found.');
       const podcast = data.results[0];
@@ -76,35 +66,47 @@ export const podcastApi = {
 
   getEpisodesFromRss: async (rssUrl: string) => {
     try {
-      const data = await rss2jsonApi(rssUrl);
-      
-      // Prevent crash if feed items are missing
-      if (!Array.isArray(data.items)) {
-        console.warn("RSS feed items are not an array.", { rssUrl, data });
-        return [];
+      const response = await fetch(`${PROXY_URL}${encodeURIComponent(rssUrl)}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch RSS feed. Status: ${response.status}`);
       }
-      
-      return data.items
-        .map((episode: any) => ({
-          guid: episode.guid,
-          title: episode.title || 'Untitled Episode',
-          // Safely access audio link
-          audio: episode.enclosure?.link,
-          duration: episode.itunes_duration || null,
-          published: episode.pubDate,
-          description: episode.description || '',
-        }))
-        // Ensure we only return episodes that are playable
-        .filter(episode => episode.audio);
+      const str = await response.text();
+      const data = new window.DOMParser().parseFromString(str, "text/xml");
+  
+      const items = data.querySelectorAll("item");
+      const episodes = [];
+  
+      items.forEach(item => {
+        const guid = item.querySelector("guid")?.textContent || '';
+        const title = item.querySelector("title")?.textContent || 'Untitled Episode';
+        const enclosure = item.querySelector("enclosure");
+        const audio = enclosure?.getAttribute("url") || '';
+        const duration = item.querySelector("itunes\\:duration")?.textContent || null;
+        const published = item.querySelector("pubDate")?.textContent || '';
+        const description = item.querySelector("description")?.textContent || '';
+        
+        if (audio) { // Only add if it's a playable episode
+            episodes.push({
+              guid,
+              title,
+              audio,
+              duration,
+              published,
+              description,
+            });
+        }
+      });
+  
+      return episodes;
+  
     } catch (error) {
-      console.error(`Error fetching episodes from RSS feed:`, error);
-      throw error; // Propagate error to be handled in the UI
+      console.error(`Error fetching or parsing episodes from RSS feed:`, error);
+      throw error;
     }
   },
 
   searchPodcasts: async (query: string) => {
     try {
-        // FIXED: Use the local proxy
         const data = await fetchJsonFromProxy(`/api/search?term=${query}&media=podcast&entity=podcast`);
         return data.results.map((p: any) => ({
             id: p.trackId.toString(),
