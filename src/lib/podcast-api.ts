@@ -75,23 +75,55 @@ export const podcastApi = {
   },
 
 
+getEpisodesFromRss: async (rssUrl: string) => {
+    // This PROXY_URL is used to bypass CORS restrictions when fetching RSS feeds.
+    const PROXY_URL = 'https://cors.sh/';
 
-  getEpisodesFromRss: async (rssUrl: string) => {
     try {
-      const data = await rss2jsonApi(rssUrl);
-      return data.items.map((episode: any) => ({
-        id: episode.guid,
-        title: episode.title,
-        audio: episode.enclosure.link,
-        duration: episode.itunes_duration,
-        published: episode.pubDate,
-        description: episode.description,
-      }));
+      // Fetch the raw XML feed through the proxy
+      const response = await fetch(`${PROXY_URL}${rssUrl}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch RSS feed. Status: ${response.status}`);
+      }
+      const str = await response.text();
+      // Use the browser's built-in DOMParser to process the XML
+      const data = new window.DOMParser().parseFromString(str, "text/xml");
+  
+      const items = data.querySelectorAll("item");
+      const episodes = [];
+  
+      // Loop through all <item> tags in the feed, which represent episodes
+      items.forEach(item => {
+        const guid = item.querySelector("guid")?.textContent || '';
+        const title = item.querySelector("title")?.textContent || 'Untitled Episode';
+        const enclosure = item.querySelector("enclosure");
+        const audio = enclosure?.getAttribute("url") || '';
+        // Note the escaped colon for the 'itunes:duration' tag
+        const duration = item.querySelector("itunes\\:duration")?.textContent || null;
+        const published = item.querySelector("pubDate")?.textContent || '';
+        const description = item.querySelector("description")?.textContent || '';
+        
+        // Only add episodes that have a valid audio URL
+        if (audio) {
+            episodes.push({
+              guid,
+              title,
+              audio,
+              duration,
+              published,
+              description,
+            });
+        }
+      });
+  
+      return episodes;
+  
     } catch (error) {
-      console.error(`Error fetching episodes from RSS feed:`, error);
+      console.error(`Error fetching or parsing episodes from RSS feed:`, error);
       throw error;
     }
   },
+  
 
   searchPodcasts: async (query: string) => {
     try {
