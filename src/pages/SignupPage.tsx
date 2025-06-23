@@ -44,6 +44,13 @@ const SignupPage = () => {
   return (
     <div className="min-h-screen w-full bg-background">
       <div className="lg:grid lg:min-h-screen lg:grid-cols-2">
+        <div className="w-full max-w-sm">
+            <DotLottieReact
+              src="https://lottie.host/e67163cc-700f-43fa-ac8a-33e9326d8395/BMW7ZD9dwm.lottie"
+              loop
+              autoplay
+            />
+          </div>
         {/* Left side: Signup Form */}
         <div className="flex items-center justify-center p-6 sm:p-12 lg:order-1 order-2">
           <div className="w-full max-w-md">
@@ -123,13 +130,7 @@ const SignupPage = () => {
 
         {/* Right side: Lottie Animation */}
         <div className="flex flex-col items-center justify-center bg-surface p-12 text-center lg:order-2 order-1">
-          <div className="w-full max-w-sm">
-            <DotLottieReact
-              src="https://lottie.host/e67163cc-700f-43fa-ac8a-33e9326d8395/BMW7ZD9dwm.lottie"
-              loop
-              autoplay
-            />
-          </div>
+          
           <h1 className="text-4xl font-bold mt-6 text-text-main hidden lg:block">Join the Community</h1>
           <p className="text-lg mt-2 text-text-secondary hidden lg:block">
             Create an account to start your podcast journey.
