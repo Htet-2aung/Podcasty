@@ -58,7 +58,8 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   }, [currentEpisode]);
   
   const playEpisode = (episode: PlayerEpisode) => {
-    if (currentEpisode?.id !== episode.id) {
+    // BUG FIX: Compare episodes by guid, not id.
+    if (currentEpisode?.guid !== episode.guid) {
         setCurrentEpisode(episode);
     } else {
         togglePlayPause();
