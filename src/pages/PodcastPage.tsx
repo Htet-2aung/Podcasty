@@ -54,11 +54,12 @@ const PodcastPage = () => {
         const details = await podcastApi.getPodcastDetails(podcastId);
         setPodcast(details);
 
-        if (details.rssUrl) {
+         if (details.rssUrl) {
           const episodeData = await podcastApi.getEpisodesFromRss(details.rssUrl);
           const episodesWithArt = episodeData.map(episode => ({
             ...episode,
-            image: details.image, // Use the main podcast image for each episode
+            image: details.image,
+            podcastTitle: details.title, // Add the podcast title here
           }));
           setEpisodes(episodesWithArt);
         } else {
