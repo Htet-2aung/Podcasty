@@ -4,8 +4,7 @@
 
 Podcasty is a sleek, modern web application for discovering, listening to, and organizing your favorite podcasts. Built with a powerful stack including React, Vite, and Supabase, it offers a seamless and feature-rich user experience.
 
-**[Live Demo](https://podcasty-two.vercel.app/)** _(Note: Replace this with your actual deployment URL)_
-
+**[Live Demo](https://podcasty-two.vercel.app/)**
 ---
 
 ## ✨ Features
