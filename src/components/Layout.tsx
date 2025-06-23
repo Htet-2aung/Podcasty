@@ -36,7 +36,7 @@ const Layout = () => {
         {/* Pass the toggle function to the Header */}
         <Header onMenuClick={() => setIsSidebarOpen(true)} />
         
-        <main className={`flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 ${currentEpisode ? 'pb-28' : ''}`}>
+         <main className={`flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 ${currentEpisode ? 'pb-28' : ''}`}>
           <Outlet />
         </main>
         
