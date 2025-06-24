@@ -15,7 +15,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
       <button onClick={onMenuClick} className="p-2 rounded-md text-text-main">
         <Menu size={24} />
       </button>
-      <h1 className="text-xl font-bold text-primary ml-4">Podcaster</h1>
+      <h1 className="text-xl font-bold text-primary ml-4">Podcasty</h1>
     </header>
   );
 };
