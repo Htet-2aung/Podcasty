@@ -2,47 +2,55 @@
 
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { VitePWA } from 'vite-plugin-pwa' // 1. Import the plugin
+import { VitePWA } from 'vite-plugin-pwa'
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  // 2. Add the VitePWA plugin to your plugins array
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      // Caching strategies
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}']
       },
-      // The manifest for the PWA
       manifest: {
         name: 'Podcasty',
         short_name: 'Podcasty',
         description: 'A Modern Podcast Discovery Platform',
-        theme_color: '#ffffff', // Or your primary theme color
-        background_color: '#f9fafb',
+        theme_color: '#4f46e5', // Main theme color from your CSS
+        background_color: '#111827', // Dark mode background from your CSS
         display: 'standalone',
         scope: '/',
         start_url: '/',
+        
+        // --- FIXES APPLIED BELOW ---
+
+        id: '/', // Fix: Added unique ID
+        orientation: 'portrait-primary', // Fix: Added orientation
+        launch_handler: { // Fix: Added launch handler
+          client_mode: ['navigate-existing', 'auto']
+        },
         icons: [
+          // Fix: Clearly separated 'any' and 'maskable' icons
           {
             src: 'pwa-192x192.png',
             sizes: '192x192',
-            type: 'image/png'
-          },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any' 
           },
           {
             src: 'pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable'
+            purpose: 'any'
+          },
+          {
+            src: 'maskable-icon-512x512.png', // Note: Use a dedicated maskable icon
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable'
           }
-        ]
+        ],
+      
       }
     })
   ],
