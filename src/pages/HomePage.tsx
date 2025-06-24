@@ -4,7 +4,17 @@ import React, { useState, useEffect } from 'react';
 import { podcastApi } from '../lib/podcast-api';
 import PodcastCard from '../components/PodcastCard';
 import { Podcast } from '../types';
-import LoadingGrid from '../components/LoadingGrid'; // 1. Import the new component
+import LoadingGrid from '../components/LoadingGrid';
+
+// --- NEW: Add a utility function to shuffle an array ---
+const shuffleArray = <T,>(array: T[]): T[] => {
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]]; // Swap elements
+  }
+  return newArray;
+};
 
 
 const HomePage = () => {
@@ -14,21 +24,18 @@ const HomePage = () => {
   useEffect(() => {
     const fetchTopPodcasts = async () => {
       try {
-        // We set loading to true at the start of the try block
         setIsLoading(true);
         const topPodcasts = await podcastApi.getTopPodcasts();
         
-        // FIXED: Ensure the API response is an array before setting state.
-        // This prevents setting state to 'undefined' if the API fails.
         if (Array.isArray(topPodcasts)) {
-          setPodcasts(topPodcasts);
+          // --- CHANGE: Shuffle the array and take a slice ---
+          const shuffledPodcasts = shuffleArray(topPodcasts);
+          setPodcasts(shuffledPodcasts.slice(0, 18)); // Display 18 random podcasts
         } else {
-          // If the API returns something unexpected, default to an empty array.
           setPodcasts([]);
         }
       } catch (error) {
         console.error("Failed to fetch top podcasts:", error);
-        // Also default to an empty array in case of an error
         setPodcasts([]);
       } finally {
         setIsLoading(false);
@@ -37,16 +44,13 @@ const HomePage = () => {
 
     fetchTopPodcasts();
   }, []);
- // 2. This is the only part that changes
+
   if (isLoading) {
     return <LoadingGrid />;
   }
+  
   return (
     <div className="podcasts-grid">
-      {/* FIXED: Added optional chaining ('?').
-        This tells React: "Only call .map() if 'podcasts' is not null or undefined."
-        This is the simplest way to prevent this specific crash.
-      */}
       {podcasts?.map(podcast => (
         <PodcastCard key={podcast.id} podcast={podcast} />
       ))}
