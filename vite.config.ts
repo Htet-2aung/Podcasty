@@ -50,7 +50,23 @@ export default defineConfig({
             purpose: 'maskable'
           }
         ],
-      
+        // Fix: Added screenshots array
+        screenshots: [
+          {
+            src: 'screenshot-1.jpg', // You need to create this file
+            sizes: '1080x1920',
+            type: 'image/jpeg',
+            form_factor: 'narrow',
+            label: 'App Home Screen'
+          },
+          {
+            src: 'screenshot-2.jpg', // You need to create this file
+            sizes: '1080x1920',
+            type: 'image/jpeg',
+            form_factor: 'narrow',
+            label: 'Podcast Player'
+          }
+        ]
       }
     })
   ],
