@@ -1,5 +1,3 @@
-// src/pages/CategoryPage.tsx
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { podcastApi } from '../lib/podcast-api';
@@ -47,5 +45,6 @@ const CategoryPage = () => {
     </div>
   );
 };
+
 
 export default CategoryPage;
