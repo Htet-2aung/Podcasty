@@ -1,6 +1,3 @@
-// ▶️ FILE: src/components/AudioPlayer.tsx
-// The floating audio player component.
-// =======================================================================
 import React from 'react';
 import { PlayerEpisode } from '../types';
 import { Play, Pause } from 'lucide-react';
@@ -35,3 +32,4 @@ export default function AudioPlayer({ episode, isPlaying, onPlayPause }: AudioPl
     </div>
   );
 }
+
