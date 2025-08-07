@@ -1,5 +1,3 @@
-// src/components/CategoryBrowser.tsx
-
 import React from 'react';
 import { categories } from '../lib/categories';
 import CategoryCard from './CategoryCard';
@@ -16,5 +14,6 @@ const CategoryBrowser: React.FC = () => {
     </section>
   );
 };
+
 
 export default CategoryBrowser;

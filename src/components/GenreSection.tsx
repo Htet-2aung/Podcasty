@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-// FIX: Import the main 'podcastApi' object
 import { podcastApi } from '../lib/podcast-api';
 import { SectionHeader } from './SectionHeader';
 import PodcastCard from './PodcastCard';
@@ -61,4 +60,5 @@ export const GenreSection = ({ title, genreId }: GenreSectionProps) => {
       </div>
     </section>
   );
+
 };

@@ -1,8 +1,7 @@
-// src/pages/ErrorPage.tsx
-
 import React from 'react';
 import { useRouteError, isRouteErrorResponse, Link } from 'react-router-dom';
 
+/// This is the error catching page that's helpful when  I might not sure what to do haha
 const ErrorPage: React.FC = () => {
   // This hook captures the error thrown by React Router
   const error = useRouteError();
@@ -45,5 +44,6 @@ const ErrorPage: React.FC = () => {
     </div>
   );
 };
+
 
 export default ErrorPage;

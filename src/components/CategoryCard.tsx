@@ -1,5 +1,3 @@
-// src/components/CategoryCard.tsx
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Category } from '../lib/categories';
@@ -21,5 +19,6 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
     </Link>
   );
 };
+
 
 export default CategoryCard;

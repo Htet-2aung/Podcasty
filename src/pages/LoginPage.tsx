@@ -1,4 +1,3 @@
-// src/pages/LoginPage.tsx
 
 import React, { useState } from 'react';
 import { useNavigate, Link, Navigate } from 'react-router-dom';
@@ -144,3 +143,4 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
