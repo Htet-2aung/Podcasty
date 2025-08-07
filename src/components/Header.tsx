@@ -1,8 +1,5 @@
-// src/components/Header.tsx
-
 import { Menu } from 'lucide-react';
 
-// The Header now accepts a function to be called when the menu is clicked
 interface HeaderProps {
   onMenuClick: () => void;
 }
