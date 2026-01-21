@@ -25,30 +25,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(new Audio());
-useEffect(() => {
-    const updateNowPlaying = async () => {
-      if (!currentEpisode) return;
 
-      const { error } = await supabase
-        .from('now_playing')
-        .update({
-          is_playing: isPlaying,
-          title: currentEpisode.title,
-          artist: currentEpisode.author || "Podcasty", // Adjust based on your Episode type
-          album_art: currentEpisode.image,
-          link: `https://podcasty-two.vercel.app`, // Or deep link if you have one
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', 1);
-
-      if (error) console.error("Sync Error:", error);
-    };
-
-    // Debounce slightly to prevent rapid spamming if user clicks play/pause fast
-    const timeout = setTimeout(updateNowPlaying, 500);
-    return () => clearTimeout(timeout);
-
-  }, [currentEpisode, isPlaying]);
   
   useEffect(() => {
     const audio = audioRef.current;
@@ -65,6 +42,28 @@ useEffect(() => {
     }
   }, [currentEpisode, isPlaying]);
 
+  useEffect(() => {
+  const updateNowPlaying = async () => {
+    if (!currentEpisode) return;
+
+    const { error } = await supabase
+      .from('now_playing')
+      .update({
+        is_playing: isPlaying,
+        title: currentEpisode.title,
+        artist: currentEpisode.author || "Podcasty", 
+        album_art: currentEpisode.image,
+        link: "https://podcasty-two.vercel.app",
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', 1);
+
+    if (error) console.error("Sync Error:", error);
+  };
+
+  updateNowPlaying();
+}, [currentEpisode, isPlaying]);
+  
   useEffect(() => {
     const audio = audioRef.current;
     const setAudioData = () => setDuration(audio.duration);
@@ -145,4 +144,5 @@ export const useAudioPlayer = () => {
   }
   return context;
 };
+
 
