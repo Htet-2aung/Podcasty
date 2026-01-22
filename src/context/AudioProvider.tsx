@@ -27,7 +27,42 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   const [currentTime, setCurrentTime] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(new Audio());
 
-  
+  // --- SUPABASE SYNC LOGIC ---
+  useEffect(() => {
+    const updateNowPlaying = async () => {
+      // Even if stopped, we want to update Supabase to show "Not Playing"
+      const status = isPlaying; 
+      const track = currentEpisode;
+
+      if (!track) return;
+
+      const { error } = await supabase
+        .from('now_playing')
+        .update({
+          is_playing: status,
+          title: track.title,
+          // Fallback to "Podcasty" if author is missing
+          artist: track.author || "Podcasty", 
+          album_art: track.image,
+          // Update the timestamp so the API knows it's fresh
+          updated_at: new Date().toISOString() 
+        })
+        .eq('id', 1);
+
+      if (error) {
+        console.error("Supabase Sync Error:", error.message);
+      } else {
+        console.log("Supabase Updated!", status ? "Playing" : "Paused");
+      }
+    };
+
+    // Debounce: Wait 500ms before saving to avoid spamming the DB
+    const timeout = setTimeout(updateNowPlaying, 500);
+    return () => clearTimeout(timeout);
+
+  }, [currentEpisode, isPlaying]);
+  // ---------------------------
+
   useEffect(() => {
     const audio = audioRef.current;
     if (currentEpisode && audio.src !== currentEpisode.audio) {
@@ -44,28 +79,6 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   }, [currentEpisode, isPlaying]);
 
   useEffect(() => {
-  const updateNowPlaying = async () => {
-    if (!currentEpisode) return;
-
-    const { error } = await supabase
-      .from('now_playing')
-      .update({
-        is_playing: isPlaying,
-        title: currentEpisode.title,
-        artist: currentEpisode.author || "Podcasty", 
-        album_art: currentEpisode.image,
-        link: "https://podcasty-two.vercel.app",
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', 1);
-
-    if (error) console.error("Sync Error:", error);
-  };
-
-  updateNowPlaying();
-}, [currentEpisode, isPlaying]);
-  
-  useEffect(() => {
     const audio = audioRef.current;
     const setAudioData = () => setDuration(audio.duration);
     const setAudioTime = () => setCurrentTime(audio.currentTime);
@@ -79,7 +92,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       audio.removeEventListener('loadeddata', setAudioData);
       audio.removeEventListener('timeupdate', setAudioTime);
     };
-  }, [playlist, currentEpisode]); // Re-add listener if playlist changes
+  }, [playlist, currentEpisode]);
 
   const playEpisode = (episode: PlayerEpisode, newPlaylist: PlayerEpisode[] = []) => {
     if (newPlaylist.length > 0) {
@@ -107,7 +120,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       setCurrentEpisode(nextEpisode);
       setIsPlaying(true);
     } else {
-      setIsPlaying(false); // Stop playing at the end of the playlist
+      setIsPlaying(false);
     }
   };
 
@@ -145,6 +158,3 @@ export const useAudioPlayer = () => {
   }
   return context;
 };
-
-
-
