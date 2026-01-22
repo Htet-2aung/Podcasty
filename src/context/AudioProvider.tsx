@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode, useRef, useEffect } from 'react';
 import { PlayerEpisode } from '../types';
+import { supabase } from '../lib/supabaseClient';
 
 interface AudioContextType {
   currentEpisode: PlayerEpisode | null;
@@ -144,5 +145,6 @@ export const useAudioPlayer = () => {
   }
   return context;
 };
+
 
 
