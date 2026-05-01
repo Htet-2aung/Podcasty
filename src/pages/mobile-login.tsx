@@ -9,18 +9,26 @@ export default function MobileLogin() {
     if (!sessionId) return;
 
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.refresh_token) {
-        
-        await supabase
-          .from('mobile_auth_sessions')
-          .insert([{ 
-            session_id: sessionId, 
-            refresh_token: session.refresh_token 
-          }]);
+  if (event === 'SIGNED_IN' && session?.refresh_token) {
+    console.log("User signed in, attempting to save session...");
+    
+    const { error } = await supabase
+      .from('mobile_auth_sessions')
+      .insert([{ 
+        session_id: sessionId, 
+        refresh_token: session.refresh_token 
+      }]);
 
-        document.body.innerHTML = '<h2>Login successful! You can close this window and return to the app.</h2>';
-      }
-    });
+    if (error) {
+      // If this alert pops up on your phone browser, the DB rejected the write
+      alert("Database Error: " + error.message);
+      console.error(error);
+    } else {
+      document.body.innerHTML = '<h2>Login successful! Return to the app.</h2>';
+    }
+  }
+});
+    
 
     return () => { authListener.subscription.unsubscribe(); };
   }, []);
