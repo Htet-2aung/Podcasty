@@ -8,10 +8,11 @@ export default function MobileLogin() {
 
     if (!sessionId) return;
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-  if (event === 'SIGNED_IN' && session?.refresh_token) {
-    console.log("User signed in, attempting to save session...");
-    
+   const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+  console.log("Current Auth Event:", event); // Debugging: See what event triggers
+
+  // Check for session existence regardless of the specific event name
+  if (session?.refresh_token) {
     const { error } = await supabase
       .from('mobile_auth_sessions')
       .insert([{ 
@@ -20,15 +21,12 @@ export default function MobileLogin() {
       }]);
 
     if (error) {
-      // If this alert pops up on your phone browser, the DB rejected the write
-      alert("Database Error: " + error.message);
-      console.error(error);
+      alert("Database Write Failed: " + error.message);
     } else {
-      document.body.innerHTML = '<h2>Login successful! Return to the app.</h2>';
+      document.body.innerHTML = '<h2>Success! Closing...</h2>';
     }
   }
 });
-    
 
     return () => { authListener.subscription.unsubscribe(); };
   }, []);
