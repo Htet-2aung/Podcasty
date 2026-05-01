@@ -1,5 +1,3 @@
-// src/main.tsx
-
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
@@ -8,7 +6,6 @@ import { ThemeProvider } from './context/ThemeProvider.tsx';
 import { AudioProvider } from './context/AudioProvider.tsx';
 import { UserProvider } from './context/UserProvider';
 
-// Import Pages and Components
 import App from './App.tsx';
 import ErrorPage from './pages/ErrorPage.tsx';
 import WelcomePage from './pages/WelcomePage.tsx';
@@ -20,14 +17,12 @@ import PodcastPage from './pages/PodcastPage.tsx';
 import LibraryPage from './pages/LibraryPage.tsx';
 import ProfilePage from './pages/ProfilePage.tsx';
 import CategoryPage from './pages/CategoryPage.tsx';
-import SettingsPage from './pages/SettingsPage.tsx'; // Import the SettingsPage
+import SettingsPage from './pages/SettingsPage.tsx'; 
 import ProtectedRoute from './components/ProtectedRoute.tsx';
-
+import MobileLogin from './pages/mobile-login';
 import './index.css';
 
-// Define the application's routes
 const router = createBrowserRouter([
-  // ... (public routes remain the same)
   {
     path: '/welcome',
     element: <WelcomePage />,
@@ -44,15 +39,21 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
   },
 
-  // Protected routes that require a user to be logged in
+  {
+    path: '/mobile-login',
+    element: <MobileLogin />,
+    errorElement: <ErrorPage />,
+  },
+  
+
   {
     path: '/',
-    element: <ProtectedRoute />, // This component guards all children
+    element: <ProtectedRoute />, 
     errorElement: <ErrorPage />,
     children: [
       {
         path: '/',
-        element: <App />, // App renders the main layout (sidebar, etc.)
+        element: <App />, 
         children: [
           {
             path: '/',
@@ -78,7 +79,6 @@ const router = createBrowserRouter([
             path: 'category/:genreId',
             element: <CategoryPage />,
           },
-          // --- ADD THIS ROUTE ---
           {
             path: 'settings',
             element: <SettingsPage />,
